@@ -59,13 +59,14 @@ export class SubmitClaim implements OnInit {
     this.error   = '';
 
     this.claimService.submitWithPhotos(
+      this.auth.getClientId()!,
       this.policyId,
       this.description,
       this.clientEstimatedCost,
       this.photos
     ).subscribe({
       next: () => this.router.navigate(['/dashboard']),
-      error: err => {
+      error: (err: any) => {
         this.error   = 'Erreur lors de la soumission. Vérifiez vos informations.';
         this.loading = false;
         console.error(err);

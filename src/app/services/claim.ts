@@ -28,13 +28,24 @@ export class ClaimService {
 
   constructor(private http: HttpClient) {}
 
-  submitWithPhotos(policyId: string, description: string,
-                   clientEstimatedCost: number, photos: File[]): Observable<Claim> {
+  submitWithPhotos(clientId: string, policyId: string, description: string,
+                   clientEstimatedCost: number, photos: string[] | File[]): Observable<Claim> {
     const form = new FormData();
-    form.append('policyId',            policyId);
-    form.append('description',         description);
-    form.append('clientEstimatedCost', String(clientEstimatedCost));
-    photos.forEach(f => form.append('photos', f));
+    form.append('clientId', clientId);
+    form.append('policyId', policyId);
+    form.append('description', description);
+    
+    if (clientEstimatedCost != null) {
+      form.append('clientEstimatedCost', String(clientEstimatedCost));
+    }
+    
+    // We allow File[] or base64 string[] based on what caller has. 
+    // Wait, the backend strictly expects multipart file. Let's just type it to File[].
+    photos.forEach((f: any) => {
+      // If it's a file, we can append it directly.
+      form.append('photos', f);
+    });
+    
     return this.http.post<Claim>(`${this.API}/claims/with-photos`, form);
   }
 
@@ -42,8 +53,8 @@ export class ClaimService {
     return this.http.get<Claim>(`${this.API}/claims/${id}`);
   }
 
-  getMyClaims(): Observable<Claim[]> {
-    return this.http.get<Claim[]>(`${this.API}/claims`);
+  getMyClaims(clientId: string): Observable<Claim[]> {
+    return this.http.get<Claim[]>(`${this.API}/claims?clientId=${clientId}`);
   }
 
   // Polls every 5 seconds until claim reaches a final status
@@ -74,6 +85,28 @@ export class ClaimService {
 
   getStats(): Observable<any> {
     return this.http.get(`${this.API}/admin/stats`);
+  }
+
+  createClient(data: any): Observable<any> {
+    return this.http.post(`${this.API}/admin/clients`, data);
+  }
+
+  getClients(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.API}/admin/clients`);
+  }
+
+  createPolicy(data: any): Observable<any> {
+    return this.http.post(`${this.API}/admin/policies`, data);
+  }
+
+  getPolicies(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.API}/admin/policies`);
+  }
+
+  ingestContract(policyId: string, file: File): Observable<any> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post(`${this.API}/admin/contracts/${policyId}/ingest`, form);
   }
 }
 

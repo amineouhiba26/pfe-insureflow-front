@@ -23,6 +23,44 @@ export class Admin implements OnInit {
   rejectNotes  = '';
   rejectError  = '';
 
+  // Add new tab and state
+  activeTab: 'claims' | 'setup' = 'claims';
+
+  // Client form
+  newClient = { fullName: '', email: '', phone: '', cin: '' };
+  clientSuccess = '';
+  clientError   = '';
+
+  // Policy form
+  newPolicy = {
+    clientId: '',
+    policyNumber: '',
+    type: 'VEHICLE_DAMAGE',
+    coverageLimit: 0,
+    deductible: 0,
+    startDate: '',
+    endDate: ''
+  };
+  policySuccess = '';
+  policyError   = '';
+
+  // Contract ingestion
+  ingestPolicyId   = '';
+  ingestFile: File | null = null;
+  ingestSuccess    = '';
+  ingestError      = '';
+
+  clients:  any[] = [];
+  policies: any[] = [];
+
+  claimTypes = [
+    { value: 'VEHICLE_DAMAGE',   label: 'Assurance Automobile' },
+    { value: 'PROPERTY_DAMAGE',  label: 'Assurance Habitation' },
+    { value: 'HEALTH',           label: 'Assurance Santé' },
+    { value: 'THEFT',            label: 'Assurance Vol' },
+    { value: 'NATURAL_DISASTER', label: 'Catastrophes Naturelles' }
+  ];
+
   constructor(
     public auth: AuthService,
     private claimService: ClaimService
@@ -31,6 +69,7 @@ export class Admin implements OnInit {
   ngOnInit() {
     this.loadStats();
     this.loadClaims();
+    this.loadSetupData();
   }
 
   loadStats() {
@@ -56,6 +95,7 @@ export class Admin implements OnInit {
   setFilter(f: 'all' | 'pending') {
     this.filter   = f;
     this.selected = null;
+    this.activeTab = 'claims';
     this.loadClaims();
   }
 
@@ -98,5 +138,66 @@ export class Admin implements OnInit {
       SUBMITTED:      'bg-gray-100 text-gray-800'
     };
     return map[status] || 'bg-gray-100 text-gray-800';
+  }
+
+  loadSetupData() {
+    this.claimService.getClients().subscribe(c => this.clients = c);
+    this.claimService.getPolicies().subscribe(p => this.policies = p);
+  }
+
+  submitClient() {
+    this.clientError = this.clientSuccess = '';
+    if (!this.newClient.fullName || !this.newClient.cin) {
+      this.clientError = 'Nom et CIN obligatoires';
+      return;
+    }
+    this.claimService.createClient(this.newClient).subscribe({
+      next: () => {
+        this.clientSuccess = 'Client créé avec succès';
+        this.newClient     = { fullName: '', email: '', phone: '', cin: '' };
+        this.loadSetupData();
+      },
+      error: err => this.clientError = err.error?.error || 'Erreur lors de la création'
+    });
+  }
+
+  submitPolicy() {
+    this.policyError = this.policySuccess = '';
+    if (!this.newPolicy.clientId || !this.newPolicy.policyNumber) {
+      this.policyError = 'Client et numéro de police obligatoires';
+      return;
+    }
+    this.claimService.createPolicy(this.newPolicy).subscribe({
+      next: () => {
+        this.policySuccess = 'Police créée avec succès';
+        this.newPolicy     = {
+          clientId: '', policyNumber: '', type: 'VEHICLE_DAMAGE',
+          coverageLimit: 0, deductible: 0, startDate: '', endDate: ''
+        };
+        this.loadSetupData();
+      },
+      error: err => this.policyError = err.error?.error || 'Erreur lors de la création'
+    });
+  }
+
+  onIngestFile(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) this.ingestFile = input.files[0];
+  }
+
+  submitIngest() {
+    this.ingestError = this.ingestSuccess = '';
+    if (!this.ingestPolicyId || !this.ingestFile) {
+      this.ingestError = 'ID de police et fichier PDF obligatoires';
+      return;
+    }
+    this.claimService.ingestContract(this.ingestPolicyId, this.ingestFile).subscribe({
+      next: () => {
+        this.ingestSuccess   = 'Contrat ingéré avec succès';
+        this.ingestPolicyId  = '';
+        this.ingestFile      = null;
+      },
+      error: err => this.ingestError = err.error?.error || 'Erreur lors de l\'ingestion'
+    });
   }
 }

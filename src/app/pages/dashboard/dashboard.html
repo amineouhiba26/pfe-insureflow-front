@@ -4,7 +4,7 @@
   <nav class="bg-white shadow-sm border-b border-gray-200">
     <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <span class="text-2xl">🛡️</span>
+        <span class="text-2xl">️</span>
         <span class="text-xl font-bold text-gray-800">InsureFlow</span>
       </div>
       <div class="flex items-center gap-4">
@@ -28,14 +28,14 @@
               [ngClass]="activeTab==='policies'
                 ? 'bg-blue-600 text-white shadow'
                 : 'bg-white text-gray-600 hover:bg-gray-100'">
-        📋 Mes contrats
+         Mes contrats
       </button>
       <button (click)="activeTab='claims'"
               class="px-5 py-2.5 text-sm font-semibold rounded-xl transition"
               [ngClass]="activeTab==='claims'
                 ? 'bg-blue-600 text-white shadow'
                 : 'bg-white text-gray-600 hover:bg-gray-100'">
-        🗂️ Mes sinistres
+         Mes sinistres
         <span *ngIf="claims.length > 0"
               class="ml-2 bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
           {{ claims.length }}
@@ -57,7 +57,6 @@
 
           <!-- Card header -->
           <div class="p-5 border-b border-gray-50">
-            <div class="text-2xl mb-2">{{ policy.typeLabel.split(' ')[0] }}</div>
             <h3 class="font-bold text-gray-800 text-sm">
               {{ policy.typeLabel.split(' ').slice(1).join(' ') }}
             </h3>
@@ -183,7 +182,7 @@
                    [ngClass]="selected.validatorResult.covered ? 'bg-green-50' : 'bg-red-50'">
                 <p class="text-xs font-semibold mb-1"
                    [ngClass]="selected.validatorResult.covered ? 'text-green-700' : 'text-red-700'">
-                  {{ selected.validatorResult.covered ? '✅ Couvert' : '❌ Non couvert' }}
+                  {{ selected.validatorResult.covered ? ' Couvert' : ' Non couvert' }}
                 </p>
                 <p class="text-xs"
                    [ngClass]="selected.validatorResult.covered ? 'text-green-600' : 'text-red-600'">

@@ -40,7 +40,8 @@ export class Dashboard implements OnInit {
 
   loadClaims() {
     this.loading = true;
-    this.claimService.getMyClaims().subscribe({
+    const clientId = this.auth.getClientId()!;
+    this.claimService.getMyClaims(clientId).subscribe({
       next: claims => {
         this.claims  = claims.sort((a, b) =>
           new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime());

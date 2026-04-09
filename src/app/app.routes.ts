@@ -9,6 +9,11 @@ export const routes: Routes = [
       import('./pages/login/login').then(m => m.Login)
   },
   {
+    path: 'admin/login',
+    loadComponent: () =>
+      import('./pages/admin-login/admin-login').then(m => m.AdminLogin)
+  },
+  {
     path: 'dashboard',
     loadComponent: () =>
       import('./pages/dashboard/dashboard').then(m => m.Dashboard),
