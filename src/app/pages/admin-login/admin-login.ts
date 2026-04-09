@@ -5,30 +5,30 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-admin-login',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './login.html'
+  templateUrl: './admin-login.html'
 })
-export class Login {
-  fullName = '';
-  cin      = '';
+export class AdminLogin {
+  username = '';
+  password = '';
   error    = '';
   loading  = false;
 
   constructor(private auth: AuthService, private router: Router) {}
 
   login() {
-    if (!this.fullName.trim() || !this.cin.trim()) {
+    if (!this.username.trim() || !this.password.trim()) {
       this.error = 'Veuillez remplir tous les champs';
       return;
     }
     this.loading = true;
     this.error   = '';
-    this.auth.login(this.fullName, this.cin).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
+    this.auth.adminLogin(this.username, this.password).subscribe({
+      next: () => this.router.navigate(['/admin']),
       error: () => {
-        this.error   = 'Nom ou CIN incorrect';
+        this.error   = 'Identifiants incorrects';
         this.loading = false;
       }
     });

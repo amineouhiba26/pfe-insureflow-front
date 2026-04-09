@@ -1,1 +1,464 @@
-<p>admin works!</p>
+<div class="min-h-screen bg-gray-50">
+
+  <!-- Navbar -->
+  <nav class="bg-indigo-700 text-white">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl"></span>
+        <span class="text-xl font-bold">InsureFlow — Administration</span>
+      </div>
+      <button (click)="auth.logout()"
+              class="text-sm text-indigo-200 hover:text-white transition">
+        Déconnexion
+      </button>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- Stats -->
+    <div *ngIf="stats" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-xl p-4 shadow-sm text-center">
+        <div class="text-3xl font-bold text-gray-800">{{ stats.total }}</div>
+        <div class="text-sm text-gray-500 mt-1">Total sinistres</div>
+      </div>
+      <div class="bg-green-50 rounded-xl p-4 shadow-sm text-center">
+        <div class="text-3xl font-bold text-green-700">{{ stats.approved }}</div>
+        <div class="text-sm text-green-600 mt-1">Approuvés</div>
+      </div>
+      <div class="bg-yellow-50 rounded-xl p-4 shadow-sm text-center">
+        <div class="text-3xl font-bold text-yellow-700">{{ stats.pending }}</div>
+        <div class="text-sm text-yellow-600 mt-1">En révision</div>
+      </div>
+      <div class="bg-red-50 rounded-xl p-4 shadow-sm text-center">
+        <div class="text-3xl font-bold text-red-700">{{ stats.rejected }}</div>
+        <div class="text-sm text-red-600 mt-1">Rejetés</div>
+      </div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="flex gap-2 mb-4">
+      <button (click)="setFilter('all')"
+              class="flex-1 py-2 text-sm font-semibold rounded-lg transition"
+              [ngClass]="filter==='all' && activeTab==='claims'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-white text-gray-600 hover:bg-gray-100'">
+        Tous
+      </button>
+      <button (click)="setFilter('pending')"
+              class="flex-1 py-2 text-sm font-semibold rounded-lg transition"
+              [ngClass]="filter==='pending' && activeTab==='claims'
+                ? 'bg-yellow-500 text-white'
+                : 'bg-white text-gray-600 hover:bg-gray-100'">
+        En révision
+      </button>
+      <button (click)="activeTab='setup'"
+              class="flex-1 py-2 text-sm font-semibold rounded-lg transition"
+              [ngClass]="activeTab==='setup'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-white text-gray-600 hover:bg-gray-100'">
+        Configuration
+      </button>
+    </div>
+
+    <div *ngIf="activeTab==='claims'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Claims list -->
+      <div class="lg:col-span-1">
+
+        <div *ngIf="loading" class="text-center py-8 text-gray-400">Chargement...</div>
+
+        <div class="space-y-2 max-h-[600px] overflow-y-auto pr-1">
+          <div *ngFor="let claim of claims"
+               (click)="selected=claim"
+               class="bg-white rounded-xl p-4 shadow-sm border-2 cursor-pointer transition hover:shadow-md"
+               [ngClass]="selected?.id===claim.id ? 'border-indigo-500' : 'border-transparent'">
+            <div class="flex items-start justify-between gap-2">
+              <p class="text-xs text-gray-600 line-clamp-2 flex-1">{{ claim.description }}</p>
+              <span class="text-xs font-medium px-2 py-0.5 rounded-full shrink-0"
+                    [ngClass]="statusColor(claim.status)">
+                {{ claim.status }}
+              </span>
+            </div>
+            <div class="mt-2 flex justify-between text-xs text-gray-400">
+              <span>{{ claim.submittedAt | date:'dd/MM HH:mm' }}</span>
+              <span *ngIf="claim.estimatedCost" class="font-semibold text-gray-600">
+                {{ claim.estimatedCost | number:'1.0-0' }} TND
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detail panel -->
+      <div class="lg:col-span-2">
+        <div *ngIf="!selected"
+             class="bg-white rounded-xl shadow-sm p-8 flex items-center justify-center h-64 text-gray-400">
+          Sélectionnez un sinistre
+        </div>
+
+        <div *ngIf="selected" class="bg-white rounded-xl shadow-sm overflow-hidden">
+
+          <!-- Header -->
+          <div class="p-6 border-b bg-gray-50">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-medium px-2 py-1 rounded-full"
+                      [ngClass]="statusColor(selected.status)">
+                  {{ selected.status }}
+                </span>
+                <p class="text-xs text-gray-400 mt-1">ID: {{ selected.id }}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-sm text-gray-500">Coût estimé système</p>
+                <p class="text-xl font-bold text-gray-800">
+                  {{ selected.estimatedCost | number:'1.0-0' }} TND
+                </p>
+                <p *ngIf="selected.clientEstimatedCost" class="text-xs text-gray-400">
+                  Client: {{ selected.clientEstimatedCost | number:'1.0-0' }} TND
+                </p>
+              </div>
+            </div>
+            <p class="text-sm text-gray-700 mt-3">{{ selected.description }}</p>
+          </div>
+
+          <!-- Progress -->
+          <div class="px-6 pt-4">
+            <app-claim-progress [status]="selected.status" />
+          </div>
+
+          <!-- Fraud result highlight -->
+          <div *ngIf="selected.fraudResult" class="mx-6 mb-4">
+            <div class="rounded-xl p-4"
+                 [ngClass]="selected.fraudResult.anomalyDetected ? 'bg-orange-50 border border-orange-200' : 'bg-green-50 border border-green-200'">
+              <div class="flex items-center gap-2">
+                <span class="text-lg"></span>
+                <div>
+                  <p class="text-sm font-semibold"
+                     [ngClass]="selected.fraudResult.anomalyDetected ? 'text-orange-800' : 'text-green-800'">
+                    {{ selected.fraudResult.anomalyType }}
+                    — Score: {{ selected.fraudResult.anomalyScore * 100 | number:'1.0-0' }}%
+                  </p>
+                  <p class="text-xs mt-0.5"
+                     [ngClass]="selected.fraudResult.anomalyDetected ? 'text-orange-600' : 'text-green-600'">
+                    {{ selected.fraudResult.priceAnalysis }}
+                  </p>
+                </div>
+              </div>
+              <p class="text-xs text-gray-600 mt-2">{{ selected.fraudResult.reasoning }}</p>
+            </div>
+          </div>
+
+          <!-- Cost breakdown -->
+          <div *ngIf="selected.estimatorResult?.costBreakdown?.length"
+               class="mx-6 mb-4">
+            <p class="text-xs font-semibold text-gray-500 uppercase mb-2">Détail des coûts</p>
+            <div class="space-y-1">
+              <div *ngFor="let item of selected.estimatorResult.costBreakdown"
+                   class="text-xs text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                {{ item }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin actions — always show for PENDING_REVIEW -->
+          <div *ngIf="selected.status === 'PENDING_REVIEW'"
+               class="p-6 border-t bg-gray-50 space-y-4">
+
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-sm font-bold text-gray-700">Décision de l'adjudicateur</span>
+              <span *ngIf="selected.fraudResult?.anomalyDetected"
+                    class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">
+                Fraude suspectée
+              </span>
+            </div>
+
+            <!-- Approve form -->
+            <div class="bg-green-50 border border-green-200 rounded-xl p-4">
+              <p class="text-sm font-semibold text-green-800 mb-2">Approuver</p>
+              <textarea [(ngModel)]="approveNotes" rows="2"
+                        placeholder="Notes d'approbation (facultatif)..."
+                        class="w-full px-3 py-2 border border-green-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-green-400 bg-white">
+              </textarea>
+              <button (click)="approve()"
+                      class="mt-2 w-full py-2.5 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition text-sm">
+                Confirmer l'approbation
+              </button>
+            </div>
+
+            <!-- Reject form -->
+            <div class="bg-red-50 border border-red-200 rounded-xl p-4">
+              <p class="text-sm font-semibold text-red-800 mb-2">Rejeter</p>
+              <input [(ngModel)]="rejectReason"
+                     placeholder="Motif du rejet (obligatoire) *"
+                     class="w-full px-3 py-2 border border-red-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-400 bg-white mb-2">
+              <textarea [(ngModel)]="rejectNotes" rows="2"
+                        placeholder="Notes additionnelles (facultatif)..."
+                        class="w-full px-3 py-2 border border-red-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-red-400 bg-white">
+              </textarea>
+              <p *ngIf="rejectError" class="text-xs text-red-600 mt-1">{{ rejectError }}</p>
+              <button (click)="reject()"
+                      class="mt-2 w-full py-2.5 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition text-sm">
+                Confirmer le rejet
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Already resolved -->
+          <div *ngIf="selected.status === 'APPROVED' || selected.status === 'REJECTED'"
+               class="p-6 border-t bg-gray-50">
+            <div class="rounded-xl p-4 text-center"
+                 [ngClass]="selected.status === 'APPROVED' ? 'bg-green-50' : 'bg-red-50'">
+              <p class="font-bold text-lg"
+                 [ngClass]="selected.status === 'APPROVED' ? 'text-green-700' : 'text-red-700'">
+                {{ selected.status === 'APPROVED' ? 'Sinistre approuvé' : 'Sinistre rejeté' }}
+              </p>
+              <p *ngIf="selected.rejectionReason" class="text-sm mt-2 text-gray-600">
+                {{ selected.rejectionReason }}
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SETUP TAB ── -->
+    <div *ngIf="activeTab==='setup'" class="space-y-8">
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Create Client -->
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+          <h3 class="text-base font-bold text-gray-800 mb-4">Nouveau client</h3>
+
+          <div *ngIf="clientSuccess"
+               class="mb-3 p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm">
+            {{ clientSuccess }}
+          </div>
+          <div *ngIf="clientError"
+               class="mb-3 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
+            {{ clientError }}
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">
+                Nom complet *
+              </label>
+              <input [(ngModel)]="newClient.fullName"
+                     type="text" placeholder=""
+                     class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">
+                CIN *
+              </label>
+              <input [(ngModel)]="newClient.cin"
+                     type="text" placeholder=""
+                     class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">Email</label>
+              <input [(ngModel)]="newClient.email"
+                     type="email" placeholder=""
+                     class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">Téléphone</label>
+              <input [(ngModel)]="newClient.phone"
+                     type="text" placeholder=""
+                     class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+            </div>
+            <button (click)="submitClient()"
+                    class="w-full py-2.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition text-sm">
+              Créer le client
+            </button>
+          </div>
+
+          <!-- Existing clients -->
+          <div *ngIf="clients.length > 0" class="mt-4 pt-4 border-t border-gray-100">
+            <p class="text-xs font-semibold text-gray-500 mb-2">
+              Clients existants ({{ clients.length }})
+            </p>
+            <div class="space-y-1 max-h-40 overflow-y-auto">
+              <div *ngFor="let c of clients"
+                   class="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                <div>
+                  <p class="text-xs font-semibold text-gray-700">{{ c.fullName }}</p>
+                  <p class="text-xs text-gray-400 font-mono">{{ c.cin }}</p>
+                </div>
+                <button (click)="newPolicy.clientId = c.id"
+                        class="text-xs text-blue-600 hover:underline">
+                  Sélectionner
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Create Policy -->
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+          <h3 class="text-base font-bold text-gray-800 mb-4">Nouvelle police</h3>
+
+          <div *ngIf="policySuccess"
+               class="mb-3 p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm">
+            {{ policySuccess }}
+          </div>
+          <div *ngIf="policyError"
+               class="mb-3 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
+            {{ policyError }}
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">
+                Client ID *
+              </label>
+              <input [(ngModel)]="newPolicy.clientId"
+                     class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-400 outline-none font-mono text-xs">
+              <p class="text-xs text-gray-400 mt-1">
+                Cliquez "Sélectionner" dans la liste des clients
+              </p>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">
+                Numéro de police *
+              </label>
+              <input [(ngModel)]="newPolicy.policyNumber"
+                     type="text" placeholder=""
+                     class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">
+                Type d'assurance *
+              </label>
+              <select [(ngModel)]="newPolicy.type"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-400 outline-none bg-white">
+                <option *ngFor="let t of claimTypes" [value]="t.value">
+                  {{ t.label }}
+                </option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">
+                  Plafond (DT)
+                </label>
+                <input [(ngModel)]="newPolicy.coverageLimit"
+                       type="number"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">
+                  Franchise (DT)
+                </label>
+                <input [(ngModel)]="newPolicy.deductible"
+                       type="number"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">
+                  Début
+                </label>
+                <input [(ngModel)]="newPolicy.startDate"
+                       type="date"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">
+                  Fin
+                </label>
+                <input [(ngModel)]="newPolicy.endDate"
+                       type="date"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-400 outline-none">
+              </div>
+            </div>
+            <button (click)="submitPolicy()"
+                    class="w-full py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition text-sm">
+              Créer la police
+            </button>
+          </div>
+        </div>
+
+        <!-- Ingest Contract -->
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+          <h3 class="text-base font-bold text-gray-800 mb-4">Ingérer un contrat PDF</h3>
+
+          <div *ngIf="ingestSuccess"
+               class="mb-3 p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm">
+            {{ ingestSuccess }}
+          </div>
+          <div *ngIf="ingestError"
+               class="mb-3 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm">
+            {{ ingestError }}
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">
+                ID de la police *
+              </label>
+              <input [(ngModel)]="ingestPolicyId"
+                     type="text" placeholder="UUID de la police"
+                     class="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-purple-400 outline-none font-mono text-xs">
+            </div>
+
+            <!-- Policies list for quick select -->
+            <div *ngIf="policies.length > 0"
+                 class="max-h-32 overflow-y-auto border border-gray-100 rounded-xl">
+              <div *ngFor="let p of policies"
+                   class="flex items-center justify-between p-2 hover:bg-gray-50 cursor-pointer"
+                   (click)="ingestPolicyId = p.id">
+                <div>
+                  <p class="text-xs font-semibold text-gray-700">{{ p.policyNumber }}</p>
+                  <p class="text-xs text-gray-400">{{ p.type }}</p>
+                </div>
+                <span class="text-xs text-purple-600">Sélectionner</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-gray-600 mb-1">
+                Fichier PDF du contrat *
+              </label>
+              <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition">
+                <div class="text-center">
+                  <div class="text-2xl mb-1"></div>
+                  <p class="text-xs text-gray-500">
+                    {{ ingestFile ? ingestFile.name : 'Cliquez pour sélectionner le PDF' }}
+                  </p>
+                </div>
+                <input type="file" accept=".pdf" class="hidden"
+                       (change)="onIngestFile($event)">
+              </label>
+            </div>
+
+            <button (click)="submitIngest()"
+                    class="w-full py-2.5 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition text-sm">
+              Ingérer dans le RAG
+            </button>
+
+            <div class="mt-3 p-3 bg-purple-50 rounded-xl">
+              <p class="text-xs text-purple-700 font-semibold mb-1">
+                Comment ça fonctionne :
+              </p>
+              <p class="text-xs text-purple-600">
+                Le PDF est découpé en chunks sémantiques et stocké dans pgvector.
+                Le ValidatorAgent consulte ces chunks pour vérifier la couverture
+                de chaque sinistre selon le contrat spécifique du client.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div> <!-- setup tab -->
+
+  </div>
+</div>
+
+Remove all the placeholders please
