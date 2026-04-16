@@ -1,36 +1,15 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './login.html'
 })
 export class Login {
-  fullName = '';
-  cin      = '';
-  error    = '';
-  loading  = false;
-
-  constructor(private auth: AuthService, private router: Router) {}
-
-  login() {
-    if (!this.fullName.trim() || !this.cin.trim()) {
-      this.error = 'Veuillez remplir tous les champs';
-      return;
-    }
-    this.loading = true;
-    this.error   = '';
-    this.auth.login(this.fullName, this.cin).subscribe({
-      next: () => this.router.navigate(['/dashboard']),
-      error: () => {
-        this.error   = 'Nom ou CIN incorrect';
-        this.loading = false;
-      }
-    });
-  }
+  constructor(private auth: AuthService) {}
+  login() { this.auth.login(); }
 }

@@ -5,11 +5,12 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { ClaimService, Claim } from '../../services/claim';
 import { ClaimProgress } from '../../shared/claim-progress/claim-progress';
+import { StatusLabelPipe, StatusColorPipe } from '../../shared/claim-status.pipe';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ClaimProgress],
+  imports: [CommonModule, FormsModule, RouterModule, ClaimProgress, StatusLabelPipe, StatusColorPipe],
   templateUrl: './admin.html'
 })
 export class Admin implements OnInit {
@@ -127,18 +128,7 @@ export class Admin implements OnInit {
     });
   }
 
-  statusColor(status: string) {
-    const map: Record<string, string> = {
-      APPROVED:       'bg-green-100 text-green-800',
-      REJECTED:       'bg-red-100 text-red-800',
-      PENDING_REVIEW: 'bg-yellow-100 text-yellow-800',
-      FRAUD_CHECK:    'bg-orange-100 text-orange-800',
-      ESTIMATING:     'bg-blue-100 text-blue-800',
-      VALIDATING:     'bg-purple-100 text-purple-800',
-      SUBMITTED:      'bg-gray-100 text-gray-800'
-    };
-    return map[status] || 'bg-gray-100 text-gray-800';
-  }
+
 
   loadSetupData() {
     this.claimService.getClients().subscribe(c => this.clients = c);
@@ -152,8 +142,10 @@ export class Admin implements OnInit {
       return;
     }
     this.claimService.createClient(this.newClient).subscribe({
-      next: () => {
-        this.clientSuccess = 'Client créé avec succès';
+      next: (res: any) => {
+        this.clientSuccess = `Client créé ✅
+    Identifiant: ${res.fullName.toLowerCase().replace(' ', '.')}
+    Mot de passe par défaut: ${this.newClient.cin}`;
         this.newClient     = { fullName: '', email: '', phone: '', cin: '' };
         this.loadSetupData();
       },

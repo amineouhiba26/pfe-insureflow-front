@@ -1,64 +1,105 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpInterceptorFn } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import Keycloak from 'keycloak-js';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs/operators';
-import { inject } from '@angular/core';
-
-export interface AuthResponse {
-  token: string;
-  clientId: string;
-  fullName: string;
-  role: string;
-}
+import { HttpInterceptorFn } from '@angular/common/http';
+import { from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly API = 'http://localhost:8080/api/v1/auth';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  private keycloak: Keycloak;
+  private initialized = false;
 
-  login(fullName: string, cin: string) {
-    return this.http.post<AuthResponse>(`${this.API}/login`, { fullName, cin }).pipe(
-      tap(res => {
-        localStorage.setItem('token',    res.token);
-        localStorage.setItem('clientId', res.clientId);
-        localStorage.setItem('fullName', res.fullName);
-        localStorage.setItem('role',     res.role);
-      })
-    );
-  }
-
-  adminLogin(username: string, password: string) {
-    return this.http.post<AuthResponse>(`${this.API}/admin/login`, { username, password }).pipe(
-      tap(res => {
-        localStorage.setItem('token',    res.token);
-        localStorage.setItem('clientId', res.clientId);
-        localStorage.setItem('fullName', res.fullName);
-        localStorage.setItem('role',     res.role);
-      })
-    );
-  }
-
-  logout() {
-    localStorage.clear();
-    this.router.navigate(['/login']);
-  }
-
-  getToken()    { return localStorage.getItem('token'); }
-  getClientId() { return localStorage.getItem('clientId'); }
-  getFullName() { return localStorage.getItem('fullName'); }
-  getRole()     { return localStorage.getItem('role'); }
-  isLoggedIn()  { return !!this.getToken(); }
-  isAdmin()     { return this.getRole() === 'ADMIN'; }
-}
-
-// JWT interceptor — attaches token to every request automatically
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    req = req.clone({
-      setHeaders: { Authorization: `Bearer ${token}` }
+  constructor(private router: Router) {
+    this.keycloak = new Keycloak({
+      url:      'http://localhost:8180',
+      realm:    'insureflow',
+      clientId: 'insureflow-frontend'
     });
   }
-  return next(req);
+
+  async init(): Promise<boolean> {
+    if (this.initialized) return this.keycloak.authenticated ?? false;
+
+    const authenticated = await this.keycloak.init({
+      onLoad:       'check-sso',
+      checkLoginIframe: false
+    });
+
+    this.initialized = true;
+    return authenticated;
+  }
+
+  login()
+  {
+    this.keycloak.login({ redirectUri: 'http://localhost:4200/dashboard'
+    }); }
+
+  logout() {
+    this.keycloak.clearToken();
+    localStorage.clear();
+    sessionStorage.clear();
+    this.keycloak.logout({ redirectUri: 'http://localhost:4200' });
+  }
+
+  adminLogin() {
+    this.keycloak.login({ redirectUri: 'http://localhost:4200/admin' });
+  }
+
+  async getToken(): Promise<string | undefined> {
+    if (!this.keycloak.authenticated) return undefined;
+
+    try {
+      // Refresh token if expires in less than 30 seconds
+      await this.keycloak.updateToken(30);
+    } catch {
+      this.logout();
+    }
+    return this.keycloak.token;
+  }
+
+  getFullName(): string {
+    const p = this.keycloak.tokenParsed;
+    if (!p) return '';
+    return `${p['given_name'] ?? ''} ${p['family_name'] ?? ''}`.trim()
+           || p['preferred_username']
+           || '';
+  }
+
+  getClientId(): string {
+    return this.keycloak.tokenParsed?.['sub'] ?? '';
+  }
+
+  getCin(): string {
+    return this.keycloak.tokenParsed?.['cin'] ?? '';
+  }
+
+  isLoggedIn(): boolean {
+    return this.keycloak.authenticated ?? false;
+  }
+
+  isAdmin(): boolean {
+    return this.keycloak.hasRealmRole('ADMIN');
+  }
+
+  isClient(): boolean {
+    return this.keycloak.hasRealmRole('CLIENT');
+  }
+}
+
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const authService = inject(AuthService);
+
+  // Get token asynchronously
+  return from(authService.getToken()).pipe(
+    switchMap(token => {
+      if (token) {
+        req = req.clone({
+          setHeaders: { Authorization: `Bearer ${token}` }
+        });
+      }
+      return next(req);
+    })
+  );
 };
