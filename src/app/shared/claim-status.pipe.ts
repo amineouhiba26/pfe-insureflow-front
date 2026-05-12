@@ -2,17 +2,32 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({ name: 'statusLabel', standalone: true })
 export class StatusLabelPipe implements PipeTransform {
-  transform(status: string): string {
-    const map: Record<string, string> = {
-      APPROVED:       '✅ Approuvé',
-      REJECTED:       '❌ Rejeté',
-      PENDING_REVIEW: '👁️ En révision',
-      FRAUD_CHECK:    '🛡️ Vérification fraude',
-      ESTIMATING:     '🔍 Estimation',
-      VALIDATING:     '📄 Validation',
-      SUBMITTED:      '📋 Soumis'
+  transform(status: string, mode: 'label' | 'colorOnly' = 'label'): string {
+    if (mode === 'colorOnly') {
+      const colorMap: Record<string, string> = {
+        APPROVED:       'bg-status-approved-bg text-status-approved-text',
+        REJECTED:       'bg-status-rejected-bg text-status-rejected-text',
+        PENDING_REVIEW: 'bg-status-revision-bg text-status-revision-text',
+        FRAUD_CHECK:    'bg-slate-100 text-slate-600',
+        ESTIMATING:     'bg-slate-100 text-slate-600',
+        VALIDATING:     'bg-slate-100 text-slate-600',
+        ROUTING:        'bg-slate-100 text-slate-600',
+        SUBMITTED:      'bg-slate-100 text-slate-600'
+      };
+      return colorMap[status] || 'bg-slate-100 text-slate-600';
+    }
+
+    const labelMap: Record<string, string> = {
+      APPROVED:       'Approuvé',
+      REJECTED:       'Rejeté',
+      PENDING_REVIEW: 'En révision',
+      FRAUD_CHECK:    'Vérification fraude',
+      ESTIMATING:     'Estimation',
+      VALIDATING:     'Validation',
+      ROUTING:        'Routage',
+      SUBMITTED:      'Soumis'
     };
-    return map[status] || status;
+    return labelMap[status] || status;
   }
 }
 
@@ -20,14 +35,15 @@ export class StatusLabelPipe implements PipeTransform {
 export class StatusColorPipe implements PipeTransform {
   transform(status: string): string {
     const map: Record<string, string> = {
-      APPROVED:       'bg-green-100 text-green-800',
-      REJECTED:       'bg-red-100 text-red-800',
-      PENDING_REVIEW: 'bg-yellow-100 text-yellow-800',
-      FRAUD_CHECK:    'bg-orange-100 text-orange-800',
-      ESTIMATING:     'bg-blue-100 text-blue-800',
-      VALIDATING:     'bg-purple-100 text-purple-800',
-      SUBMITTED:      'bg-gray-100 text-gray-800'
+      APPROVED:       'bg-status-approved-bg text-status-approved-text',
+      REJECTED:       'bg-status-rejected-bg text-status-rejected-text',
+      PENDING_REVIEW: 'bg-status-revision-bg text-status-revision-text',
+      FRAUD_CHECK:    'bg-slate-100 text-slate-600',
+      ESTIMATING:     'bg-slate-100 text-slate-600',
+      VALIDATING:     'bg-slate-100 text-slate-600',
+      ROUTING:        'bg-slate-100 text-slate-600',
+      SUBMITTED:      'bg-slate-100 text-slate-600'
     };
-    return map[status] || 'bg-gray-100 text-gray-800';
+    return map[status] || 'bg-slate-100 text-slate-600';
   }
 }

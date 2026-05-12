@@ -67,6 +67,16 @@ export class AuthService {
            || '';
   }
 
+  getInitials(): string {
+    const name = this.getFullName();
+    if (!name) return '??';
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  }
+
   getClientId(): string {
     return this.keycloak.tokenParsed?.['sub'] ?? '';
   }

@@ -5,12 +5,12 @@ import { AuthService } from '../../services/auth';
 import { ClaimService, Claim, Policy } from '../../services/claim';
 import { PolicyService } from '../../services/policy';
 import { ClaimProgress } from '../../shared/claim-progress/claim-progress';
-import { StatusLabelPipe, StatusColorPipe } from '../../shared/claim-status.pipe';
+import { StatusLabelPipe } from '../../shared/claim-status.pipe';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, ClaimProgress, StatusLabelPipe, StatusColorPipe],
+  imports: [CommonModule, RouterModule, ClaimProgress, StatusLabelPipe],
   templateUrl: './dashboard.html'
 })
 export class Dashboard implements OnInit {

@@ -5,12 +5,12 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { ClaimService, Claim } from '../../services/claim';
 import { ClaimProgress } from '../../shared/claim-progress/claim-progress';
-import { StatusLabelPipe, StatusColorPipe } from '../../shared/claim-status.pipe';
+import { StatusLabelPipe } from '../../shared/claim-status.pipe';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, ClaimProgress, StatusLabelPipe, StatusColorPipe],
+  imports: [CommonModule, FormsModule, RouterModule, ClaimProgress, StatusLabelPipe],
   templateUrl: './admin.html'
 })
 export class Admin implements OnInit {

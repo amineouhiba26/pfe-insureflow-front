@@ -1,47 +1,45 @@
-<div class="w-full py-4">
-  <div class="flex items-center justify-between">
+<div class="w-full py-6">
+  <div class="relative flex items-center justify-between">
+    <!-- Background Connector Tracks (one per gap) -->
+    <div class="absolute top-[14px] left-0 w-full flex justify-between px-[14px] -z-0">
+      <div *ngFor="let step of steps; let i = index; let last = last"
+           class="h-[2px] grow"
+           [class.hidden]="last"
+           [ngClass]="getConnectorClass(i)">
+      </div>
+    </div>
+
     <ng-container *ngFor="let step of steps; let i = index">
+      <div class="relative z-10 flex flex-col items-center">
+        <!-- Circle -->
+        <div class="w-7 h-7 rounded-full flex items-center justify-center transition-all duration-300"
+             [ngClass]="getStepCircleClass(i)">
+          
+          <!-- Checkmark for completed -->
+          <svg *ngIf="isCompleted(i) || (i === 5 && status === 'APPROVED')" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+          </svg>
 
-      <!-- Step circle -->
-      <div class="flex flex-col items-center flex-1">
-        <div class="relative flex items-center justify-center">
+          <!-- X for rejected final -->
+          <svg *ngIf="i === 5 && status === 'REJECTED'" class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+          </svg>
 
-          <!-- Connector line left -->
-          <div *ngIf="i > 0"
-               class="absolute right-1/2 top-1/2 -translate-y-1/2 h-0.5 w-full"
-               [ngClass]="isCompleted(i) ? 'bg-blue-600' : 'bg-gray-200'">
-          </div>
-
-          <!-- Circle -->
-          <div class="relative z-10 w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold border-2 transition-all duration-500"
-               [ngClass]="{
-                 'bg-blue-600 border-blue-600 text-white': isCompleted(i),
-                 'bg-white border-blue-600 text-blue-600 shadow-lg scale-110': isActive(i),
-                 'bg-white border-gray-300 text-gray-400': !isCompleted(i) && !isActive(i)
-               }">
-            <span *ngIf="isCompleted(i)">✓</span>
-            <span *ngIf="!isCompleted(i)">{{ step.icon }}</span>
-          </div>
+          <!-- Dot for active -->
+          <div *ngIf="isActive(i) && i < 5" class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></div>
+          
+          <!-- Initial for pending -->
+          <div *ngIf="!isCompleted(i) && !isActive(i) && i < 5" class="w-1.5 h-1.5 rounded-full bg-slate-200"></div>
+          <div *ngIf="i === 5 && !finalStatuses.includes(status)" class="w-1.5 h-1.5 rounded-full bg-slate-200"></div>
         </div>
 
         <!-- Label -->
-        <div class="mt-2 text-xs text-center font-medium"
-             [ngClass]="{
-               'text-blue-600': isActive(i) || isCompleted(i),
-               'text-gray-400': !isActive(i) && !isCompleted(i)
-             }">
+        <div class="mt-2 text-[10px] font-semibold uppercase tracking-wider text-center"
+             [ngClass]="getLabelClass(i)">
           <span *ngIf="i < 5">{{ step.label }}</span>
-          <span *ngIf="i === 5" [ngClass]="getFinalColor()">{{ getFinalLabel() }}</span>
+          <span *ngIf="i === 5">{{ getFinalLabel() }}</span>
         </div>
       </div>
-
     </ng-container>
-  </div>
-
-  <!-- Pulsing indicator when processing -->
-  <div *ngIf="!['APPROVED','REJECTED','PENDING_REVIEW'].includes(status)"
-       class="mt-4 flex items-center justify-center gap-2 text-sm text-blue-600">
-    <div class="w-2 h-2 rounded-full bg-blue-600 animate-ping"></div>
-    <span>Traitement en cours...</span>
   </div>
 </div>

@@ -1,25 +1,55 @@
-<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-  <div class="w-full max-w-md text-center">
-
-    <div class="text-6xl mb-4">🛡️</div>
-    <h1 class="text-3xl font-bold text-gray-800 mb-2">InsureFlow</h1>
-    <p class="text-gray-500 mb-8">Espace Client</p>
-
-    <div class="bg-white rounded-2xl shadow-xl p-8">
-      <p class="text-gray-600 mb-6 text-sm">
-        Connectez-vous avec votre compte InsureFlow
-      </p>
-      <button (click)="login()"
-              class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition text-sm">
-        Se connecter
-      </button>
+<div class="min-h-screen bg-slate-100 flex items-center justify-center p-6 font-sans">
+  
+  <div class="w-full max-w-md fade-in-up">
+    <div class="text-center mb-10">
+      <div class="flex flex-col items-center gap-4">
+        <svg width="80" height="100" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-2">
+            <!-- Shield -->
+            <path d="M100 0L20 40V120C20 175.2 54.2 225.8 100 240C145.8 225.8 180 175.2 180 120V40L100 0Z" fill="#1E293B"/>
+            <!-- Network lines and dots (simplified) -->
+            <circle cx="100" cy="110" r="40" stroke="#475569" stroke-width="2" stroke-dasharray="4 4"/>
+            <circle cx="100" cy="110" r="25" fill="#10B981"/>
+            <!-- Lightning/S shape -->
+            <path d="M102 95L92 112H108L98 125" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="100" cy="55" r="4" fill="#64748B"/>
+            <circle cx="100" cy="165" r="4" fill="#64748B"/>
+            <circle cx="45" cy="110" r="4" fill="#64748B"/>
+            <circle cx="155" cy="110" r="4" fill="#64748B"/>
+        </svg>
+        <div class="flex flex-col items-center">
+            <h1 class="text-3xl font-bold tracking-tight">
+                <span class="text-[#2d3192]">Insure</span><span class="text-[#00a859]">Flow</span>
+            </h1>
+            <p class="text-[9px] font-bold uppercase tracking-[0.3em] text-slate-500 mt-1">Agentic Claims Intelligence</p>
+        </div>
+      </div>
     </div>
 
-    <div class="mt-4">
-      <a routerLink="/admin/login"
-         class="text-xs text-gray-400 hover:text-gray-600">
-        Accès administrateur →
-      </a>
+    <!-- Login Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-10">
+      <div class="mb-8">
+        <h2 class="text-xl font-bold text-slate-900 tracking-tight">Espace Client</h2>
+        <p class="text-slate-500 text-sm mt-1">Connectez-vous pour gérer vos dossiers.</p>
+      </div>
+      
+      <button (click)="login()"
+              class="w-full py-3.5 bg-slate-900 text-white font-bold uppercase tracking-widest text-[11px] rounded-lg transition-all hover:bg-slate-800 active:scale-95 shadow-sm">
+        Authentification Keycloak
+      </button>
+
+      <div class="mt-8 pt-6 border-t border-slate-100 flex flex-col items-center gap-4">
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
+            Accès sécurisé SSL/TLS
+          </p>
+          <a routerLink="/admin/login" class="text-[10px] font-bold text-slate-500 hover:text-slate-800 transition-colors uppercase tracking-widest decoration-slate-300 underline underline-offset-4">
+            Console Administration
+          </a>
+      </div>
+    </div>
+    
+    <div class="mt-10 text-center">
+      <p class="text-[9px] text-slate-400 uppercase tracking-widest font-medium">© 2026 InsureFlow Systems</p>
     </div>
   </div>
 </div>
