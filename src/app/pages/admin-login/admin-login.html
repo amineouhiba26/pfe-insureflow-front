@@ -1,41 +1,41 @@
-<div class="min-h-screen bg-[#0f172a] flex items-center justify-center p-6 font-sans">
-  
+<div class="min-h-screen bg-sky-50 flex items-center justify-center p-6 font-sans">
+
   <div class="w-full max-w-md fade-in-up">
     <div class="text-center mb-10">
       <div class="flex flex-col items-center gap-4">
         <svg width="60" height="72" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M100 0L20 40V120C20 175.2 54.2 225.8 100 240C145.8 225.8 180 175.2 180 120V40L100 0Z" fill="#FFFFFF"/>
+            <path d="M100 0L20 40V120C20 175.2 54.2 225.8 100 240C145.8 225.8 180 175.2 180 120V40L100 0Z" fill="#1E293B"/>
             <circle cx="100" cy="110" r="25" fill="#10B981"/>
-            <path d="M102 95L92 112H108L98 125" stroke="#0F172A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M102 95L92 112H108L98 125" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <div class="flex flex-col">
-            <h1 class="text-2xl font-bold tracking-tight text-white">
-                InsureFlow <span class="text-indigo-400 font-medium text-xs ml-1 uppercase pl-1 border-l border-white/20">Admin</span>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+                InsureFlow <span class="text-sky-500 font-medium text-xs ml-1 uppercase pl-1 border-l border-slate-200">Admin</span>
             </h1>
-            <p class="text-[8px] font-bold uppercase tracking-[0.4em] text-slate-500 mt-1">Infrastructure Access</p>
+            <p class="text-[8px] font-bold uppercase tracking-[0.4em] text-slate-400 mt-1">Infrastructure Access</p>
         </div>
       </div>
     </div>
 
     <!-- Login Card -->
-    <div class="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-10 shadow-2xl">
+    <div class="bg-white rounded-2xl border border-sky-100 p-10 shadow-sm">
       <div class="mb-8 text-center">
-        <h2 class="text-lg font-bold text-white tracking-tight">Authentification</h2>
-        <p class="text-slate-400 text-xs mt-1 font-medium">Accès réservé aux administrateurs système.</p>
+        <h2 class="text-lg font-bold text-slate-900 tracking-tight">Authentification</h2>
+        <p class="text-slate-500 text-xs mt-1 font-medium">Accès réservé aux administrateurs système.</p>
       </div>
 
       <button (click)="login()"
-              class="w-full py-4 bg-indigo-600 text-white font-bold uppercase tracking-widest text-[10px] rounded-lg transition-all hover:bg-indigo-500 active:scale-95 shadow-lg shadow-indigo-900/40">
+              class="w-full py-4 bg-sky-500 text-white font-bold uppercase tracking-widest text-[10px] rounded-lg transition-all hover:bg-sky-400 active:scale-95 shadow-sm shadow-sky-100">
         Connexion Keycloak
       </button>
 
-      <div class="mt-10 pt-6 border-t border-white/5 flex flex-col items-center gap-6">
-          <a routerLink="/login" class="text-[9px] font-bold text-slate-500 hover:text-white transition-all uppercase tracking-widest flex items-center gap-2">
+      <div class="mt-10 pt-6 border-t border-slate-100 flex flex-col items-center gap-6">
+          <a routerLink="/login" class="text-[9px] font-bold text-slate-500 hover:text-slate-800 transition-all uppercase tracking-widest flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             Retour Portail Client
           </a>
       </div>
     </div>
-    
+
   </div>
 </div>

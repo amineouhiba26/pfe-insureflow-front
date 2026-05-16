@@ -1,0 +1,182 @@
+<div class="analytics-page">
+
+  <!-- ═══════════ HEADER ═══════════ -->
+  <header class="analytics-header">
+    <div class="analytics-header__inner">
+
+      <div class="analytics-header__left">
+        <h1 class="analytics-header__title">InsureFlow Analytics</h1>
+        <p class="analytics-header__subtitle">
+          @if (summary) {
+            <strong>{{ summary.totalClaims }}</strong> sinistres · Temps réel
+          }
+        </p>
+      </div>
+
+      <div class="analytics-header__right">
+        <span class="analytics-header__timestamp">
+          {{ lastUpdated | date:'dd/MM HH:mm' }}
+        </span>
+        <a routerLink="/admin" class="analytics-header__btn-back">← Admin</a>
+        <button (click)="auth.logout()" class="analytics-header__btn-logout">Déconnexion</button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ═══════════ LOADING SKELETON ═══════════ -->
+  @if (loading) {
+    <div class="skel-container">
+
+      <div class="skel-row skel-row--7">
+        <div class="skel-kpi"></div>
+        <div class="skel-kpi"></div>
+        <div class="skel-kpi"></div>
+        <div class="skel-kpi"></div>
+        <div class="skel-kpi"></div>
+        <div class="skel-kpi"></div>
+        <div class="skel-kpi"></div>
+      </div>
+
+      <div class="skel-row skel-row--3">
+        <div class="skel-chart"></div>
+        <div class="skel-chart"></div>
+        <div class="skel-chart"></div>
+      </div>
+
+      <div class="skel-row skel-row--3">
+        <div class="skel-chart"></div>
+        <div class="skel-chart"></div>
+        <div class="skel-chart"></div>
+      </div>
+
+    </div>
+  }
+
+  <!-- ═══════════ DASHBOARD ═══════════ -->
+  @if (!loading) {
+    <div class="analytics-content">
+
+      <!-- Error Banner -->
+      @if (hasErrors) {
+        <div class="error-banner">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <span>Certaines données n'ont pas pu être chargées — résultats partiels</span>
+        </div>
+      }
+
+      <!-- ── KPI Strip: 7 cards ── -->
+      <div class="kpi-strip">
+
+        <div class="kpi-card kpi-card--indigo">
+          <span class="kpi-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+          </span>
+          <div>
+            <span class="kpi-card__label">Total</span>
+            <p class="kpi-card__value">{{ summary?.totalClaims ?? '—' }}</p>
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-card--green">
+          <span class="kpi-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </span>
+          <div>
+            <span class="kpi-card__label">Approuvés</span>
+            <p class="kpi-card__value">{{ summary?.approvedClaims ?? '—' }}</p>
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-card--red">
+          <span class="kpi-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </span>
+          <div>
+            <span class="kpi-card__label">Rejetés</span>
+            <p class="kpi-card__value">{{ summary?.rejectedClaims ?? '—' }}</p>
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-card--amber">
+          <span class="kpi-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+            </svg>
+          </span>
+          <div>
+            <span class="kpi-card__label">En attente</span>
+            <p class="kpi-card__value">{{ summary?.pendingClaims ?? '—' }}</p>
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-card--blue">
+          <span class="kpi-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </span>
+          <div>
+            <span class="kpi-card__label">Moyen</span>
+            @if (summary) {
+              <p class="kpi-card__value">{{ summary.avgEstimatedAmount | number:'1.0-0' }}<span class="kpi-card__unit">TND</span></p>
+            } @else {
+              <p class="kpi-card__value">—</p>
+            }
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-card--purple">
+          <span class="kpi-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </span>
+          <div>
+            <span class="kpi-card__label">Délai</span>
+            @if (summary) {
+              <p class="kpi-card__value">{{ summary.avgProcessingTimeSeconds | number:'1.0-0' }}<span class="kpi-card__unit">sec</span></p>
+            } @else {
+              <p class="kpi-card__value">—</p>
+            }
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-card--orange">
+          <span class="kpi-card__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </span>
+          <div>
+            <span class="kpi-card__label">Fraudes</span>
+            <p class="kpi-card__value">{{ summary?.fraudFlaggedClaims ?? '—' }}</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── Charts: 3x2 Grid ── -->
+      <div class="charts-grid">
+
+        <app-claims-by-type-chart [data]="byTypeData"></app-claims-by-type-chart>
+        <app-claims-by-status-chart [data]="byStatusData"></app-claims-by-status-chart>
+        <app-monthly-evolution-chart [data]="monthlyData"></app-monthly-evolution-chart>
+        <app-avg-amount-chart [data]="avgAmountData"></app-avg-amount-chart>
+        <app-fraud-distribution-chart [data]="fraudDistData"></app-fraud-distribution-chart>
+        <app-agent-performance-chart [data]="agentPerfData"></app-agent-performance-chart>
+
+      </div>
+
+    </div>
+  }
+
+</div>

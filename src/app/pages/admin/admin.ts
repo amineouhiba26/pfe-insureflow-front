@@ -62,6 +62,11 @@ export class Admin implements OnInit {
     { value: 'NATURAL_DISASTER', label: 'Catastrophes Naturelles' }
   ];
 
+  get selectedClient(): any {
+    if (!this.selected || !this.clients.length) return null;
+    return this.clients.find(c => c.id === this.selected!.clientId) ?? null;
+  }
+
   constructor(
     public auth: AuthService,
     private claimService: ClaimService

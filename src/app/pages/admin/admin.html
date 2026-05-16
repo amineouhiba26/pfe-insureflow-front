@@ -1,26 +1,26 @@
 <div class="min-h-screen bg-[#f1f5f9] flex flex-col font-sans">
 
   <!-- Compact Admin Navbar -->
-  <nav class="sticky top-0 z-50 bg-[#0f172a] text-white h-16 flex items-center shadow-lg">
+  <nav class="sticky top-0 z-50 bg-white border-b border-sky-100 h-16 flex items-center shadow-sm">
     <div class="max-w-[1500px] w-full mx-auto px-6 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <svg width="28" height="34" viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M100 0L20 40V120C20 175.2 54.2 225.8 100 240C145.8 225.8 180 175.2 180 120V40L100 0Z" fill="#FFFFFF"/>
+            <path d="M100 0L20 40V120C20 175.2 54.2 225.8 100 240C145.8 225.8 180 175.2 180 120V40L100 0Z" fill="#1E293B"/>
             <circle cx="100" cy="110" r="25" fill="#10B981"/>
-            <path d="M102 95L92 112H108L98 125" stroke="#0F172A" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M102 95L92 112H108L98 125" stroke="white" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <div class="flex flex-col">
-            <span class="text-base font-bold tracking-tight">InsureFlow <span class="text-indigo-400 font-medium text-[10px] ml-1 uppercase pl-1 border-l border-white/20">Admin</span></span>
+            <span class="text-base font-bold tracking-tight text-slate-900">InsureFlow <span class="text-sky-500 font-medium text-[10px] ml-1 uppercase pl-1 border-l border-slate-200">Admin</span></span>
             <span class="text-[7px] font-bold uppercase tracking-[0.2em] text-slate-400">Agentic Console</span>
         </div>
       </div>
 
       <div class="flex items-center gap-8">
-        <div class="hidden sm:flex text-[10px] font-bold text-slate-500 uppercase tracking-widest border border-white/10 px-3 py-1 rounded-md">
+        <div class="hidden sm:flex text-[10px] font-bold text-slate-500 uppercase tracking-widest border border-slate-200 px-3 py-1 rounded-md">
             Status: Opérationnel
         </div>
         <button (click)="auth.logout()"
-                class="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-all">
+                class="text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-all">
           Déconnexion
         </button>
       </div>
@@ -54,14 +54,14 @@
       <button (click)="setFilter('all')"
               class="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all border"
               [ngClass]="filter==='all' && activeTab==='claims'
-                ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                ? 'bg-sky-500 text-white border-sky-500 shadow-sm'
                 : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'">
         Tout le Flux
       </button>
       <button (click)="setFilter('pending')"
               class="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all border"
               [ngClass]="filter==='pending' && activeTab==='claims'
-                ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
+                ? 'bg-yellow-400 text-yellow-900 border-yellow-400 shadow-sm'
                 : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'">
         Review Manuelle
       </button>
@@ -69,10 +69,15 @@
       <button (click)="activeTab='setup'"
               class="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all border"
               [ngClass]="activeTab==='setup'
-                ? 'bg-slate-900 text-white border-slate-900'
+                ? 'bg-sky-500 text-white border-sky-500'
                 : 'bg-white text-slate-500 border-slate-200 hover:border-slate-300'">
         Infrastructure & RAG
       </button>
+      <div class="h-4 w-[1px] bg-slate-300 mx-2"></div>
+      <a routerLink="/admin/analytics"
+         class="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all border bg-white text-slate-500 border-slate-200 hover:border-slate-300 hover:bg-slate-50">
+        Analytics
+      </a>
     </div>
 
     <!-- ── CLAIMS TABLE LAYER ── -->
@@ -81,16 +86,20 @@
       <!-- Stream Sidebar -->
       <div class="w-[360px] shrink-0 flex flex-col min-h-0">
         <div *ngIf="loading" class="grow flex items-center justify-center">
-          <div class="w-6 h-6 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin"></div>
+          <div class="w-6 h-6 border-2 border-slate-200 border-t-sky-500 rounded-full animate-spin"></div>
         </div>
 
         <div *ngIf="!loading" class="grow overflow-y-auto space-y-2 pr-2 custom-scrollbar">
           <div *ngFor="let claim of claims"
                (click)="selected=claim"
-               class="relative group cursor-pointer p-4 rounded-xl border border-white transition-all duration-200"
-               [ngClass]="selected?.id===claim.id ? 'bg-white shadow-md border-indigo-500 ring-1 ring-indigo-50/50' : 'hover:bg-white hover:border-slate-200'">
+               class="relative group cursor-pointer p-4 rounded-xl border transition-all duration-200"
+               [ngClass]="selected?.id===claim.id ? 'bg-sky-50 shadow-md border-sky-400 ring-1 ring-sky-100'
+                 : claim.status==='REJECTED' ? 'bg-red-50 border-red-200 hover:bg-red-100'
+                 : claim.status==='PENDING_REVIEW' ? 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100'
+                 : claim.status==='APPROVED' ? 'bg-green-50 border-green-200 hover:bg-green-100'
+                 : 'bg-white border-slate-200 hover:bg-slate-50'">
             
-            <div *ngIf="selected?.id===claim.id" class="absolute left-0 top-3 bottom-3 w-[3px] bg-indigo-500 rounded-r-md"></div>
+            <div *ngIf="selected?.id===claim.id" class="absolute left-0 top-3 bottom-3 w-[3px] bg-sky-500 rounded-r-md"></div>
             
             <div class="flex items-start justify-between gap-3 min-w-0">
               <div class="min-w-0 flex-1">
@@ -107,98 +116,128 @@
       </div>
 
       <!-- Detail Analysis Terminal -->
-      <div class="grow bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col shadow-sm">
-        <div *ngIf="!selected" class="grow flex flex-col items-center justify-center text-slate-300 p-12 text-center">
-            <svg class="w-16 h-16 mb-4 opacity-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-            <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Sélectionnez un événement pour l'audit</p>
+      <div class="flex-1 self-start bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+
+        <!-- Empty state -->
+        <div *ngIf="!selected" class="flex flex-col items-center justify-center text-slate-300 p-12 text-center h-64">
+          <svg class="w-12 h-12 mb-4 opacity-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">Sélectionnez un dossier pour l'audit</p>
         </div>
 
-        <div *ngIf="selected" class="grow flex flex-col min-h-0">
-          <div class="p-8 border-b border-slate-100 shrink-0 bg-slate-50/30">
-            <div class="flex items-start justify-between">
-              <div class="max-w-2xl min-w-0">
-                <div class="flex items-center gap-3 mb-4">
-                  <span class="rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest border border-slate-200" [ngClass]="selected.status | statusLabel : 'colorOnly'">{{ selected.status | statusLabel }}</span>
-                  <span class="text-[9px] font-mono text-slate-400">{{ selected.id }}</span>
-                </div>
-                <h2 class="text-2xl font-bold text-slate-900 tracking-tight leading-tight">{{ selected.description }}</h2>
+        <!-- Selected claim content -->
+        <div *ngIf="selected" class="p-4 space-y-4">
+
+          <!-- ① Claim Header -->
+          <div class="flex items-start justify-between gap-4 pb-4 border-b border-slate-100">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2 flex-wrap mb-1.5">
+                <span class="rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest border"
+                      [ngClass]="selected.status | statusLabel : 'colorOnly'">{{ selected.status | statusLabel }}</span>
+                <span class="text-[9px] font-mono text-slate-400 truncate">{{ selected.id }}</span>
               </div>
-              <div class="text-right">
-                <div class="p-4 rounded-xl border border-slate-100 bg-white">
-                  <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Index de Confiance</p>
-                  <p class="text-2xl font-black text-slate-900">{{ selected.confidenceScore * 100 | number:'1.0-0' }}%</p>
+              <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                Soumis le {{ selected.submittedAt | date:'dd MMM yyyy · HH:mm' }} &nbsp;·&nbsp; {{ selected.type | titlecase }}
+              </p>
+            </div>
+            <div class="shrink-0 p-2.5 rounded-xl border border-slate-100 bg-slate-50 text-center min-w-[80px]">
+              <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Confiance IA</p>
+              <p class="text-xl font-black text-slate-900">{{ selected.confidenceScore * 100 | number:'1.0-0' }}%</p>
+            </div>
+          </div>
+
+          <!-- ② Claim Description -->
+          <div class="pb-4 border-b border-slate-100">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Description du Sinistre</p>
+            <p class="text-sm text-slate-700 leading-relaxed">{{ selected.description }}</p>
+          </div>
+
+          <!-- ③ Client Information -->
+          <div class="pb-4 border-b border-slate-100">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Informations Client</p>
+            <div *ngIf="selectedClient; else noClient" class="flex gap-2">
+              <div class="flex-1 p-3 bg-sky-50 rounded-lg border border-sky-100">
+                <p class="text-[8px] font-bold text-sky-500 uppercase tracking-widest mb-0.5">Nom complet</p>
+                <p class="text-xs font-bold text-slate-800">{{ selectedClient.fullName }}</p>
+              </div>
+              <div class="flex-1 p-3 bg-sky-50 rounded-lg border border-sky-100">
+                <p class="text-[8px] font-bold text-sky-500 uppercase tracking-widest mb-0.5">Email</p>
+                <p class="text-xs font-bold text-slate-800 truncate">{{ selectedClient.email }}</p>
+              </div>
+            </div>
+            <ng-template #noClient>
+              <p class="text-xs text-slate-400 italic">Client ID: {{ selected.clientId }}</p>
+            </ng-template>
+          </div>
+
+          <!-- ④ Pipeline d'Intelligence -->
+          <div class="pb-4 border-b border-slate-100">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Pipeline d'Intelligence</p>
+            <app-claim-progress [status]="selected.status" />
+          </div>
+
+          <!-- ⑤ Audit de Risque + Analyse des Coûts -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pb-4 border-b border-slate-100">
+            <div *ngIf="selected.fraudResult"
+                 class="p-3 rounded-xl border"
+                 [ngClass]="selected.fraudResult.anomalyDetected ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200'">
+              <p class="text-[9px] font-black uppercase tracking-widest mb-2"
+                 [ngClass]="selected.fraudResult.anomalyDetected ? 'text-red-400' : 'text-green-500'">Audit de Risque</p>
+              <p class="text-sm font-bold mb-1"
+                 [ngClass]="selected.fraudResult.anomalyDetected ? 'text-red-800' : 'text-green-800'">{{ selected.fraudResult.anomalyType }}</p>
+              <div class="h-1.5 w-full bg-black/5 rounded-full mb-2">
+                <div class="h-full rounded-full transition-all"
+                     [style.width.%]="selected.fraudResult.anomalyScore * 100"
+                     [ngClass]="selected.fraudResult.anomalyDetected ? 'bg-red-400' : 'bg-green-400'"></div>
+              </div>
+              <p class="text-[10px] leading-relaxed"
+                 [ngClass]="selected.fraudResult.anomalyDetected ? 'text-red-700' : 'text-green-700'">{{ selected.fraudResult.reasoning }}</p>
+            </div>
+
+            <div *ngIf="selected.estimatorResult?.costBreakdown?.length" class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Analyse des Coûts</p>
+              <div class="space-y-1.5">
+                <div *ngFor="let item of selected.estimatorResult.costBreakdown"
+                     class="text-xs text-slate-600 flex items-start gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1 shrink-0"></div>
+                  <span>{{ item }}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="grow overflow-y-auto p-8 space-y-12 custom-scrollbar">
-            
-            <section>
-              <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Pipeline d'Intelligence</h3>
-              <app-claim-progress [status]="selected.status" />
-            </section>
+          <!-- ⑦ Décision Requise (PENDING_REVIEW only) -->
+          <section *ngIf="selected.status === 'PENDING_REVIEW'">
+            <div class="bg-yellow-50 rounded-xl border border-yellow-200 p-4">
+              <h3 class="text-sm font-bold text-yellow-900 tracking-tight mb-1">Décision Requise</h3>
+              <p class="text-[10px] font-bold text-yellow-600 uppercase tracking-widest mb-4">Arbitrer sur la base des preuves IA ci-dessus.</p>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Security / Fraud -->
-              <div *ngIf="selected.fraudResult" 
-                   class="p-6 rounded-2xl border"
-                   [ngClass]="selected.fraudResult.anomalyDetected ? 'bg-red-50/40 border-red-200' : 'bg-green-50/40 border-green-200'">
-                <p class="text-[9px] font-black uppercase tracking-widest mb-4 opacity-50" [ngClass]="selected.fraudResult.anomalyDetected ? 'text-red-900' : 'text-green-900'">Audit de Risque</p>
-                <p class="text-lg font-bold mb-1" [ngClass]="selected.fraudResult.anomalyDetected ? 'text-red-900' : 'text-green-900'">{{ selected.fraudResult.anomalyType }}</p>
-                <div class="h-1.5 w-full bg-black/5 rounded-full mb-3">
-                  <div class="h-full rounded-full" [style.width.%]="selected.fraudResult.anomalyScore * 100" [ngClass]="selected.fraudResult.anomalyDetected ? 'bg-red-600' : 'bg-green-600'"></div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-3">
+                  <textarea [(ngModel)]="approveNotes" rows="2"
+                            class="w-full p-3 bg-white border border-slate-200 rounded-lg text-xs font-bold outline-none"
+                            placeholder="Notes d'approbation justificatives..."></textarea>
+                  <button (click)="approve()"
+                          class="w-full py-2.5 bg-emerald-500 text-white font-bold uppercase tracking-widest text-[10px] rounded-lg hover:bg-emerald-400 transition-all">
+                    Valider le Dossier
+                  </button>
                 </div>
-                <p class="text-[10px] leading-relaxed opacity-70" [ngClass]="selected.fraudResult.anomalyDetected ? 'text-red-800' : 'text-green-800'">{{ selected.fraudResult.reasoning }}</p>
-              </div>
-
-              <!-- Logic Breakdowns -->
-              <div *ngIf="selected.estimatorResult?.costBreakdown?.length" class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
-                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-4">Analyse des Coûts</p>
-                <div class="space-y-2">
-                  <div *ngFor="let item of selected.estimatorResult.costBreakdown" class="text-xs font-medium text-slate-600 flex items-start gap-3">
-                    <div class="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1 shrink-0"></div>
-                    <span>{{ item }}</span>
-                  </div>
+                <div class="space-y-3">
+                  <input [(ngModel)]="rejectReason"
+                         class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-[10px] font-bold outline-none"
+                         placeholder="MOTIF DE REJET (OBLIGATOIRE)">
+                  <textarea [(ngModel)]="rejectNotes" rows="1"
+                            class="w-full p-3 bg-white border border-slate-200 rounded-lg text-xs font-bold outline-none"
+                            placeholder="Détails techniques du rejet..."></textarea>
+                  <p *ngIf="rejectError" class="text-[10px] font-bold text-red-600 uppercase text-center">{{ rejectError }}</p>
+                  <button (click)="reject()"
+                          class="w-full py-2.5 bg-red-400 text-white font-bold uppercase tracking-widest text-[10px] rounded-lg hover:bg-red-300 transition-all">
+                    Confirmer le Rejet
+                  </button>
                 </div>
               </div>
             </div>
+          </section>
 
-            <!-- Adjudication terminal -->
-            <section *ngIf="selected.status === 'PENDING_REVIEW'" class="pt-8 border-t border-slate-100">
-              <div class="bg-white rounded-2xl border-2 border-slate-50 p-8 shadow-sm">
-                <h3 class="text-xl font-bold text-slate-900 tracking-tight mb-2">Décision Requise</h3>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-8">Veuillez arbitrer sur la base des preuves IA ci-dessus.</p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div class="space-y-5">
-                    <textarea [(ngModel)]="approveNotes" rows="4"
-                              class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none"
-                              placeholder="Notes d'approbation justificatives..."></textarea>
-                    <button (click)="approve()"
-                            class="w-full py-3.5 bg-green-600 text-white font-bold uppercase tracking-widest text-[10px] rounded-lg hover:bg-green-700 transition-all">
-                      Valider le Dossier
-                    </button>
-                  </div>
-
-                  <div class="space-y-4">
-                    <input [(ngModel)]="rejectReason"
-                           class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold outline-none"
-                           placeholder="MOTIF DE REJET (OBLIGATOIRE)">
-                    <textarea [(ngModel)]="rejectNotes" rows="2"
-                              class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold outline-none"
-                              placeholder="Détails techniques du rejet..."></textarea>
-                    <p *ngIf="rejectError" class="text-[10px] font-bold text-red-600 uppercase text-center">{{ rejectError }}</p>
-                    <button (click)="reject()"
-                            class="w-full py-3.5 bg-red-600 text-white font-bold uppercase tracking-widest text-[10px] rounded-lg hover:bg-red-700 transition-all">
-                      Confirmer le Rejet
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-          </div>
         </div>
       </div>
     </div>
@@ -252,7 +291,7 @@
           <div class="space-y-4">
             <div>
               <label class="text-[9px] font-bold text-slate-400 uppercase mb-2 block ml-1 tracking-widest">Client Target (UUID)</label>
-              <input [(ngModel)]="newPolicy.clientId" class="w-full px-4 py-3 bg-slate-900 text-indigo-300 border-0 rounded-lg text-[10px] font-mono outline-none">
+              <input [(ngModel)]="newPolicy.clientId" class="w-full px-4 py-3 bg-sky-50 text-sky-800 border border-sky-200 rounded-lg text-[10px] font-mono outline-none">
             </div>
             <div>
               <label class="text-[9px] font-bold text-slate-400 uppercase mb-2 block ml-1 tracking-widest">N° de Police Unique</label>
@@ -281,28 +320,28 @@
         </div>
 
         <!-- RAG -->
-        <div class="card-premium p-8 h-fit bg-[#0f172a] text-white">
-          <h3 class="text-lg font-bold text-white mb-6 tracking-tight">Indexation RAG</h3>
+        <div class="card-premium p-8 h-fit">
+          <h3 class="text-lg font-bold text-slate-900 mb-6 tracking-tight">Indexation RAG</h3>
           <div class="space-y-6">
             <div>
-              <label class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest mb-3 block ml-1">Police Target</label>
-              <div class="bg-black/20 border border-white/5 rounded-xl p-2 max-h-[160px] overflow-y-auto custom-scrollbar-dark flex flex-col gap-1.5">
-                 <div *ngFor="let p of policies" 
-                      (click)="ingestPolicyId = p.id"
-                      class="flex items-center justify-between p-3 rounded-lg hover:bg-white/5 cursor-pointer border border-transparent"
-                      [ngClass]="ingestPolicyId === p.id ? 'border-indigo-500/50 bg-white/5' : ''">
-                    <p class="text-[10px] font-bold text-slate-300 truncate tracking-tight pr-10">Pol: {{ p.policyNumber }}</p>
-                    <span class="text-[8px] font-black text-indigo-500 uppercase">Load</span>
-                 </div>
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3 block ml-1">Police Target</label>
+              <div class="bg-slate-50 border border-slate-200 rounded-xl p-2 max-h-[160px] overflow-y-auto custom-scrollbar flex flex-col gap-1.5">
+                <div *ngFor="let p of policies"
+                     (click)="ingestPolicyId = p.id"
+                     class="flex items-center justify-between p-3 rounded-lg hover:bg-slate-100 cursor-pointer border border-transparent"
+                     [ngClass]="ingestPolicyId === p.id ? 'border-indigo-400 bg-indigo-50' : ''">
+                  <p class="text-[10px] font-bold text-slate-700 truncate tracking-tight pr-10">Pol: {{ p.policyNumber }}</p>
+                  <span class="text-[8px] font-black text-indigo-500 uppercase">Load</span>
+                </div>
               </div>
             </div>
 
             <div>
-              <label class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest mb-3 block ml-1">PDF Policy Raw</label>
-              <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/10 rounded-xl cursor-pointer hover:border-indigo-500 transition-all group">
+              <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3 block ml-1">PDF Policy Raw</label>
+              <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:border-indigo-400 transition-all group">
                 <div class="flex flex-col items-center justify-center text-center p-4">
-                  <svg class="w-6 h-6 text-white/30 group-hover:text-white mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                  <p class="text-[9px] font-bold text-white/40 group-hover:text-white">
+                  <svg class="w-6 h-6 text-slate-300 group-hover:text-indigo-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                  <p class="text-[9px] font-bold text-slate-400 group-hover:text-indigo-500">
                     {{ ingestFile ? ingestFile.name : 'Ingérer PDF' }}
                   </p>
                 </div>
@@ -310,11 +349,11 @@
               </label>
             </div>
 
-            <button (click)="submitIngest()" 
-                    class="w-full py-4 bg-indigo-600 text-white font-bold uppercase tracking-widest text-[10px] rounded-lg hover:bg-indigo-500 active:scale-95 transition-all shadow-lg shadow-indigo-900/40">
+            <button (click)="submitIngest()"
+                    class="w-full py-4 bg-sky-500 text-white font-bold uppercase tracking-widest text-[10px] rounded-lg hover:bg-sky-400 active:scale-95 transition-all shadow-sm shadow-sky-100">
               Embed Metadata
             </button>
-            <p class="text-[8px] text-slate-500 font-bold uppercase tracking-tight text-center leading-relaxed">Vecteurs indexés • Audit sémantique activé</p>
+            <p class="text-[8px] text-slate-400 font-bold uppercase tracking-tight text-center leading-relaxed">Vecteurs indexés • Audit sémantique activé</p>
           </div>
         </div>
 

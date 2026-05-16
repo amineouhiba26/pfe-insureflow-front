@@ -6,12 +6,12 @@
   --color-navy: #1e293b;
   --color-navy-dark: #0f172a;
   
-  --color-status-revision-bg: #f8fafc;
-  --color-status-revision-text: #64748b;
-  --color-status-approved-bg: #f0fdf4;
-  --color-status-approved-text: #166534;
-  --color-status-rejected-bg: #fef2f2;
-  --color-status-rejected-text: #991b1b;
+  --color-status-revision-bg: #fefce8;
+  --color-status-revision-text: #92400e;
+  --color-status-approved-bg: #dcfce7;
+  --color-status-approved-text: #14532d;
+  --color-status-rejected-bg: #fee2e2;
+  --color-status-rejected-text: #7f1d1d;
 
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
@@ -31,8 +31,8 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-slate-800 text-white rounded-lg px-5 py-2.5 font-bold uppercase tracking-widest text-[10px] 
-           transition-all duration-300 shadow-md hover:bg-slate-700 active:scale-95;
+    @apply bg-sky-500 text-white rounded-lg px-5 py-2.5 font-bold uppercase tracking-widest text-[10px]
+           transition-all duration-300 shadow-sm hover:bg-sky-400 active:scale-95;
   }
   
   .card-premium {
